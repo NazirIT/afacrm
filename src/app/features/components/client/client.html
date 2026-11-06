@@ -1,0 +1,141 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">GESTION DE LA CLIENTÈLE</p>
+      <h1>Liste des clients</h1>
+      <p class="subtitle">Consultez les informations des clients enregistrés.</p>
+    </div>
+    <button type="button" class="btn btn-primary" routerLink="/appel">+ Nouveau client</button>
+  </header>
+
+  <div class="stats">
+    <article class="stat-card">
+      <span class="stat-label">Total des clients</span>
+      <strong>{{ nombreClients() }}</strong>
+      <span class="stat-note">Clients enregistrés</span>
+    </article>
+  </div>
+
+  <section class="panel">
+    <div class="panel-header">
+      <div>
+        <h2>Répertoire des clients</h2>
+        <p>Un seul enregistrement par client.</p>
+      </div>
+      <input type="search" placeholder="Rechercher par nom, prénom, téléphone..." 
+            [ngModel]="recherche"
+            (ngModelChange)="rechercherClients($event)"
+            />
+      @if (messageRecherche) {
+        <small><i>{{ messageRecherche }}</i></small>
+      }
+    </div>
+    
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Prénom</th>
+            <th>Téléphone</th>
+            <th>Dernier échange</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (client of (recherche ? clientsRecherches : clients); track client.id) {
+            <tr>
+              <td><strong>{{ client.nom_client }}</strong></td>
+              <td>{{ client.prenom_client }}</td>
+              <td>{{ client.numero_appelant }}</td>
+              <td>{{ client.resume }}</td>
+              <td>
+                <button type="button" class="btn btn-light" (click)="ouvrirDetails(client)">
+                  Modifier / Gérer
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5">Aucun client trouvé.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <small>Affichage de {{ (recherche ? clientsRecherches : clients).length }} client(s) sur {{ clients.length }}</small>
+  </section>
+
+  <!-- Modal Action / Détails Client & Modification Statut/Priorité -->
+  @if (popupDetailsOuvert && clientSelectionne) {
+    <div class="modal-overlay" (click)="fermerDetails()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <span class="eyebrow">ACTION CLIENT</span>
+            <h2>{{ clientSelectionne.prenom_client }} {{ clientSelectionne.nom_client }}</h2>
+          </div>
+          <button type="button" class="modal-close" (click)="fermerDetails()">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          <p><strong>Téléphone :</strong> {{ clientSelectionne.numero_appelant }}</p>
+          <p><strong>Dernier appel :</strong> {{ clientSelectionne.date_heure | date:'dd/MM/yyyy HH:mm' }}</p>
+          <p><strong>Résumé de l'appel :</strong></p>
+          <div class="modal-resume">
+            {{ clientSelectionne.resume }}
+          </div>
+
+          <hr class="modal-divider" />
+
+          <h3>Traitement de la réclamation</h3>
+
+          @if (reclamationEnCours) {
+            <p><strong>Réf réclamation :</strong> REC-{{ reclamationEnCours.id }}</p>
+            <p><strong>Problème :</strong> {{ reclamationEnCours.probleme?.type_probleme || '-' }}</p>
+            <p><strong>Description :</strong> {{ reclamationEnCours.description }}</p>
+
+            <div class="form-group">
+              <label for="statutSelect">Statut du problème :</label>
+              <select id="statutSelect" [(ngModel)]="statutSelectionne" class="form-select">
+                <option value="ouverte">Ouverte</option>
+                <option value="en_cours">En cours</option>
+                <option value="resolue">Résolue</option>
+                <option value="cloturee">Clôturée</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="prioriteSelect">Priorité / Urgence :</label>
+              <select id="prioriteSelect" [(ngModel)]="prioriteSelectionnee" class="form-select">
+                <option value="faible">Faible</option>
+                <option value="moyenne">Moyenne</option>
+                <option value="haute">Haute</option>
+                <option value="critique">Critique</option>
+              </select>
+            </div>
+
+            @if (messageSucces) {
+              <div class="alert-success">{{ messageSucces }}</div>
+            }
+            @if (erreurModification) {
+              <div class="alert-error">{{ erreurModification }}</div>
+            }
+
+            <div class="modal-actions">
+              <button type="button" class="btn btn-primary" [disabled]="sauvegardeEnCours" (click)="enregistrerModifications()">
+                {{ sauvegardeEnCours ? 'Enregistrement...' : 'Enregistrer' }}
+              </button>
+              <button type="button" class="btn btn-secondary" (click)="fermerDetails()">Fermer</button>
+            </div>
+          } @else {
+            <p class="text-muted"><i>Aucune réclamation associée à ce client pour le moment.</i></p>
+            <div class="modal-actions">
+              <button type="button" class="btn btn-secondary" (click)="fermerDetails()">Fermer</button>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</section>

@@ -1,0 +1,131 @@
+
+<section class="page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">VUE D'ENSEMBLE</p>
+      <h1>Tableau de bord</h1>
+      <p class="subtitle">Suivez l'activité et les indicateurs du service client.</p>
+    </div>
+    <span class="date-label">{{today | date:'EEEE dd MMMM yyyy'}}</span>
+  </header>
+
+  <section class="stats">
+    <article class="stat-card">
+      <div class="stat-top">
+        <span class="stat-icon blue-bg">AP</span>
+      </div>
+      <span class="stat-label">Appels enregistrés</span>
+      <strong>{{nombreAppels}}</strong>
+    </article>
+
+    <article class="stat-card">
+      <div class="stat-top">
+        <span class="stat-icon purple-bg">RC</span>
+      </div>
+      <span class="stat-label">Réclamations reçues</span>
+      <strong>{{nombreReclamations}}</strong>
+    </article>
+
+    <article class="stat-card">
+      <div class="stat-top">
+        <span class="stat-icon orange-bg">AT</span>
+        <span class="trend neutral">À traiter</span>
+      </div>
+      <span class="stat-label">Réclamations en attente</span>
+      <strong>{{reclamationsEnAttente}}</strong>
+      <p>Demandes nécessitant un suivi</p>
+    </article>
+
+    <article class="stat-card">
+      <div class="stat-top">
+        <span class="stat-icon green-bg">RS</span>
+        <span class="trend positive">{{pourcentageResolues}} %</span>
+      </div>
+      <span class="stat-label">Réclamations résolues</span>
+      <strong>{{reclamationsResolues}}</strong>
+      <p>Sur {{nombreReclamations}} réclamations reçues</p>
+    </article>
+  </section>
+
+  <section class="content-grid">
+    <article class="panel activity-panel">
+      <div class="panel-header">
+        <div>
+          <h2>Activité récente</h2>
+          <p>Derniers appels et réclamations enregistrés.</p>
+        </div>
+        <button class="btn btn-light">Voir tout</button>
+      </div>
+
+      @for (appel of appels | slice:0:4; track appel.id) {
+        <div class="activity-item">
+          <span class="activity-icon call-icon">AP</span>
+          <div class="activity-info">
+            <strong>Appel enregistré</strong>
+            <p>{{appel.prenom_client}} {{appel.nom_client}} · {{appel.numero_appelant}}</p>
+            <small>{{appel.resume}}</small>
+          </div>
+          <span class="activity-time">{{ appel.date_heure | date:'HH:mm' }}</span>
+        </div>
+      }
+
+      @if (appels.length === 0) {
+        <p class="text-muted"><i>Aucune activité récente.</i></p>
+      }
+    </article>
+
+    <article class="panel status-panel">
+      <div class="panel-header">
+        <div>
+          <h2>État des réclamations</h2>
+          <p>Répartition actuelle</p>
+        </div>
+      </div>
+
+      <div class="total-box">
+        <span>Total des réclamations</span>
+        <strong>{{nombreReclamations}}</strong>
+      </div>
+
+      <div class="status-row">
+        <div class="status-description">
+          <span><i class="dot pending-dot"></i> En attente</span>
+          <strong>{{reclamationsEnAttente}}</strong>
+        </div>
+        <div class="progress-track">
+          <div class="progress-bar pending-bar" [style.width.%]="pourcentageAttente"></div>
+        </div>
+      </div>
+
+      <div class="status-row">
+        <div class="status-description">
+          <span><i class="dot progress-dot"></i> En cours</span>
+          <strong>{{reclamationsEnCours}}</strong>
+        </div>
+        <div class="progress-track">
+          <div class="progress-bar progress-bar-blue" [style.width.%]="pourcentageEnCours"></div>
+        </div>
+      </div>
+
+      <div class="status-row">
+        <div class="status-description">
+          <span><i class="dot resolved-dot"></i> Résolues</span>
+          <strong>{{reclamationsResolues}}</strong>
+        </div>
+        <div class="progress-track">
+          <div class="progress-bar resolved-bar" [style.width.%]="pourcentageResolues"></div>
+        </div>
+      </div>
+
+      <div class="status-row">
+        <div class="status-description">
+          <span><i class="dot closed-dot"></i> Clôturées</span>
+          <strong>{{reclamationsCloturees}}</strong>
+        </div>
+        <div class="progress-track">
+          <div class="progress-bar closed-bar" [style.width.%]="pourcentageCloturees"></div>
+        </div>
+      </div>
+    </article>
+  </section>
+</section>

@@ -1,0 +1,158 @@
+/* Conteneur principal */
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #102a43, #1d4568);
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+/* Carte de connexion */
+.login-card {
+  width: 100%;
+  max-width: 430px;
+  background-color: #ffffff;
+  padding: 40px;
+  border-radius: 14px;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.2);
+}
+
+/* En-tête */
+.login-header {
+  text-align: center;
+  margin-bottom: 35px;
+}
+
+.login-header h1 {
+  color: #f28c28;
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.login-header p {
+  color: #718096;
+  font-size: 13px;
+  margin: 0;
+}
+
+/* Titre du formulaire */
+.login-title {
+  margin-bottom: 25px;
+}
+
+.login-title h2 {
+  color: #102a43;
+  font-size: 23px;
+  margin-bottom: 8px;
+}
+
+.login-title p {
+  color: #718096;
+  font-size: 14px;
+}
+
+/* Champs du formulaire */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  color: #334e68;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.form-group input {
+  padding: 13px 14px;
+  border: 1px solid #cbd5e0;
+  border-radius: 7px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-group input:focus {
+  border-color: #f28c28;
+  box-shadow: 0 0 0 3px rgba(242, 140, 40, 0.12);
+}
+
+.form-group input::placeholder {
+  color: #a0aec0;
+}
+
+/* Messages de validation */
+.form-group small {
+  color: #e53e3e;
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+/* Erreur de connexion */
+.error-message {
+  color: #c53030;
+  background-color: #fff5f5;
+  border: 1px solid #fed7d7;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-bottom: 18px;
+}
+
+/* Bouton de connexion */
+.login-card button {
+  width: 100%;
+  padding: 14px;
+  background-color: #f28c28;
+  color: #ffffff;
+  border: none;
+  border-radius: 7px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.login-card button:hover:not(:disabled) {
+  background-color: #dc7415;
+  transform: translateY(-1px);
+}
+
+.login-card button:disabled {
+  background-color: #cbd5e0;
+  cursor: not-allowed;
+}
+
+/* Pied de page */
+.login-footer {
+  text-align: center;
+  margin-top: 30px;
+  border-top: 1px solid #edf2f7;
+  padding-top: 18px;
+}
+
+.login-footer p {
+  color: #a0aec0;
+  font-size: 12px;
+  margin: 0;
+}
+
+/* Adaptation mobile */
+@media (max-width: 480px) {
+  .login-card {
+    padding: 28px 22px;
+  }
+
+  .login-header h1 {
+    font-size: 28px;
+  }
+
+  .login-title h2 {
+    font-size: 21px;
+  }
+}

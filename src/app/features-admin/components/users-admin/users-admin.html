@@ -1,0 +1,388 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">ADMINISTRATION DES AGENTS</p>
+      <h1>Gestion des agents</h1>
+      <p class="subtitle">Créez, modifiez et gérez les comptes des agents.</p>
+    </div>
+
+    <div style="display:flex; gap:10px;">
+      <button type="button" class="btn btn-light" (click)="chargerUtilisateurs()">
+        <span class="material-symbols-outlined">refresh</span> Actualiser
+      </button>
+      <button type="button" class="btn btn-primary" (click)="ouvrirCreation()">
+        <span class="material-symbols-outlined">person_add</span> Nouvel Agent
+      </button>
+    </div>
+  </header>
+
+  @if (erreur) {
+    <div class="alert alert-error">
+      <span class="material-symbols-outlined">warning</span>
+      <span>{{ erreur }}</span>
+    </div>
+  }
+
+  @if (messageSucces) {
+    <div class="alert alert-success">
+      <span class="material-symbols-outlined">check_circle</span>
+      <span>{{ messageSucces }}</span>
+    </div>
+  }
+
+  <!-- Statistiques Agents -->
+  <div class="stats">
+    <article class="stat-card">
+      <div class="stat-top">
+        <span class="stat-icon purple-bg">AG</span>
+      </div>
+      <span class="stat-label">Agents actifs</span>
+      <strong>{{ totalAgents }}</strong>
+      <p>Traitement des tickets clients et appels</p>
+    </article>
+    <article class="stat-card">
+      <div class="stat-top">
+        <span class="stat-icon orange-bg">AD</span>
+      </div>
+      <span class="stat-label">Administrateurs</span>
+      <strong>{{ totalAdmins }}</strong>
+      <p>Gestion de la plateforme</p>
+    </article>
+  </div>
+
+  <section class="panel">
+    <div class="panel-header">
+      <div>
+        <h2>Annuaire des agents</h2>
+        <p>Rechercher un agent par nom ou identifiant.</p>
+      </div>
+
+      <div class="filters-row">
+        <!-- Filtre rôle -->
+        <div class="role-filter">
+          <button 
+            type="button" 
+            class="filter-pill" 
+            [class.active]="filtreRole === 'AGENT'"
+            (click)="filtreRole = 'AGENT'"
+          >
+            Agents ({{ totalAgents }})
+          </button>
+          <button 
+            type="button" 
+            class="filter-pill" 
+            [class.active]="filtreRole === 'ADMIN'"
+            (click)="filtreRole = 'ADMIN'"
+          >
+            Administrateur ({{ totalAdmins }})
+          </button>
+          <button 
+            type="button" 
+            class="filter-pill" 
+            [class.active]="filtreRole === 'TOUS'"
+            (click)="filtreRole = 'TOUS'"
+          >
+            Tous
+          </button>
+        </div>
+
+        <!-- Recherche -->
+        <input 
+          type="search" 
+          placeholder="Rechercher nom, email, tél..." 
+          [(ngModel)]="recherche"
+          class="form-search"
+        />
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Agent</th>
+            <th>Nom complet</th>
+            <th>Email</th>
+            <th>Téléphone</th>
+            <th>Rôle</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (u of utilisateursFiltres; track u.id) {
+            <tr>
+              <td>
+                <div class="user-cell">
+                  <div class="avatar-sm">
+                    {{ u.first_name[0] || 'A' }}{{ u.last_name[0] || 'G' }}
+                  </div>
+                  <strong>&#64;{{ u.username }}</strong>
+                </div>
+              </td>
+              <td>{{ u.first_name }} {{ u.last_name }}</td>
+              <td>{{ u.email || '-' }}</td>
+              <td>{{ u.telephone || '-' }}</td>
+              <td>
+                <span class="role-badge" [ngClass]="'role-' + u.role.toLowerCase()">
+                  {{ u.role }}
+                </span>
+              </td>
+              <td>
+                <div class="action-group">
+                  <button type="button" class="btn btn-sm btn-light" title="Consulter" (click)="ouvrirDetails(u)">
+                    <span class="material-symbols-outlined">visibility</span>
+                  </button>
+                  <button type="button" class="btn btn-sm btn-edit" title="Modifier" (click)="ouvrirEdition(u)">
+                    <span class="material-symbols-outlined">edit</span>
+                  </button>
+                  <button type="button" class="btn btn-sm btn-danger" title="Supprimer / Désactiver" (click)="ouvrirSuppression(u)">
+                    <span class="material-symbols-outlined">delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="text-center py-20 text-muted">
+                Aucun agent ne correspond aux critères.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel-footer">
+      <small>Affichage de {{ utilisateursFiltres.length }} compte(s)</small>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       MODAL 1 — DÉTAILS
+  ══════════════════════════════════════════════════════════ -->
+  @if (modalDetailsOuvert && utilisateurSelectionne) {
+    <div class="modal-overlay" (click)="fermerDetails()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <span class="eyebrow">FICHE AGENT</span>
+            <h2>{{ utilisateurSelectionne.first_name }} {{ utilisateurSelectionne.last_name }}</h2>
+          </div>
+          <button type="button" class="modal-close" (click)="fermerDetails()">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="detail-row">
+            <span class="detail-label">Identifiant</span>
+            <span>&#64;{{ utilisateurSelectionne.username }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Rôle</span>
+            <span class="role-badge" [ngClass]="'role-' + utilisateurSelectionne.role.toLowerCase()">
+              {{ utilisateurSelectionne.role }}
+            </span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Email</span>
+            <span>{{ utilisateurSelectionne.email || 'Non renseigné' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Téléphone</span>
+            <span>{{ utilisateurSelectionne.telephone || 'Non renseigné' }}</span>
+          </div>
+          @if (utilisateurSelectionne.is_active === false) {
+            <div class="alert-warn" style="margin-top:14px;">
+              <span class="material-symbols-outlined">warning</span>
+              Ce compte est désactivé.
+            </div>
+          }
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-edit" (click)="fermerDetails(); ouvrirEdition(utilisateurSelectionne)">
+            <span class="material-symbols-outlined" style="vertical-align:middle;font-size:16px">edit</span> Modifier
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="fermerDetails()">Fermer</button>
+        </div>
+      </div>
+    </div>
+  }
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       MODAL 2 — CRÉATION
+  ══════════════════════════════════════════════════════════ -->
+  @if (modalCreationOuvert) {
+    <div class="modal-overlay" (click)="fermerCreation()">
+      <div class="modal-content modal-lg" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <span class="eyebrow">NOUVEAU COMPTE</span>
+            <h2>Créer un agent</h2>
+          </div>
+          <button type="button" class="modal-close" (click)="fermerCreation()">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          @if (erreurCreation) {
+            <div class="alert alert-error" style="margin-bottom:16px;">
+              <span class="material-symbols-outlined">error</span>
+              <span>{{ erreurCreation }}</span>
+            </div>
+          }
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Prénom *</label>
+              <input type="text" class="form-input" placeholder="ex: Khalil" [(ngModel)]="nouvelAgent.first_name" />
+            </div>
+            <div class="form-group">
+              <label>Nom *</label>
+              <input type="text" class="form-input" placeholder="ex: Benali" [(ngModel)]="nouvelAgent.last_name" />
+            </div>
+            <div class="form-group">
+              <label>Identifiant (username) *</label>
+              <input type="text" class="form-input" placeholder="ex: khalil.benali" [(ngModel)]="nouvelAgent.username" />
+            </div>
+            <div class="form-group">
+              <label>Mot de passe initial *</label>
+              <input type="password" class="form-input" placeholder="Min. 6 caractères" [(ngModel)]="nouvelAgent.password" />
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" class="form-input" placeholder="ex: khalil@example.com" [(ngModel)]="nouvelAgent.email" />
+            </div>
+            <div class="form-group">
+              <label>Téléphone</label>
+              <input type="tel" class="form-input" placeholder="ex: +213 555 00 00" [(ngModel)]="nouvelAgent.telephone" />
+            </div>
+            <div class="form-group form-full">
+              <label>Rôle</label>
+              <select class="form-select" [(ngModel)]="nouvelAgent.role">
+                <option value="AGENT">Agent</option>
+                <option value="ADMIN">Administrateur</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="fermerCreation()" [disabled]="enCoursCreation">Annuler</button>
+          <button type="button" class="btn btn-primary" (click)="creerAgent()" [disabled]="enCoursCreation">
+            {{ enCoursCreation ? 'Création en cours...' : 'Créer le compte' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       MODAL 3 — MODIFICATION
+  ══════════════════════════════════════════════════════════ -->
+  @if (modalEditionOuvert) {
+    <div class="modal-overlay" (click)="fermerEdition()">
+      <div class="modal-content modal-lg" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <span class="eyebrow">MODIFICATION COMPTE</span>
+            <h2>Modifier &#64;{{ agentEnEdition.username }}</h2>
+          </div>
+          <button type="button" class="modal-close" (click)="fermerEdition()">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          @if (erreurEdition) {
+            <div class="alert alert-error" style="margin-bottom:16px;">
+              <span class="material-symbols-outlined">error</span>
+              <span>{{ erreurEdition }}</span>
+            </div>
+          }
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Prénom *</label>
+              <input type="text" class="form-input" [(ngModel)]="agentEnEdition.first_name" />
+            </div>
+            <div class="form-group">
+              <label>Nom *</label>
+              <input type="text" class="form-input" [(ngModel)]="agentEnEdition.last_name" />
+            </div>
+            <div class="form-group">
+              <label>Identifiant (username) *</label>
+              <input type="text" class="form-input" [(ngModel)]="agentEnEdition.username" />
+            </div>
+            <div class="form-group">
+              <label>Nouveau mot de passe <span class="text-muted">(laisser vide = inchangé)</span></label>
+              <input type="password" class="form-input" placeholder="Min. 6 caractères" [(ngModel)]="agentEnEdition.password" />
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" class="form-input" [(ngModel)]="agentEnEdition.email" />
+            </div>
+            <div class="form-group">
+              <label>Téléphone</label>
+              <input type="tel" class="form-input" [(ngModel)]="agentEnEdition.telephone" />
+            </div>
+            <div class="form-group form-full">
+              <label>Rôle</label>
+              <select class="form-select" [(ngModel)]="agentEnEdition.role">
+                <option value="AGENT">Agent</option>
+                <option value="ADMIN">Administrateur</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="fermerEdition()" [disabled]="enCoursEdition">Annuler</button>
+          <button type="button" class="btn btn-primary" (click)="sauvegarderEdition()" [disabled]="enCoursEdition">
+            {{ enCoursEdition ? 'Enregistrement...' : 'Enregistrer' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       MODAL 4 — SUPPRESSION / DÉSACTIVATION
+  ══════════════════════════════════════════════════════════ -->
+  @if (modalSuppressionOuvert && agentASupprimer) {
+    <div class="modal-overlay" (click)="fermerSuppression()">
+      <div class="modal-content modal-sm" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <span class="eyebrow">CONFIRMATION</span>
+            <h2>Supprimer ce compte ?</h2>
+          </div>
+          <button type="button" class="modal-close" (click)="fermerSuppression()">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          @if (erreurSuppression) {
+            <div class="alert alert-error" style="margin-bottom:12px;">
+              <span class="material-symbols-outlined">error</span>
+              <span>{{ erreurSuppression }}</span>
+            </div>
+          }
+
+          <p>Vous allez supprimer le compte de <strong>{{ agentASupprimer.first_name }} {{ agentASupprimer.last_name }}</strong> (&#64;{{ agentASupprimer.username }}).</p>
+          <div class="alert-warn">
+            <span class="material-symbols-outlined">info</span>
+            <span>Si cet agent a des appels ou réclamations rattachés, son compte sera <strong>désactivé</strong> plutôt que supprimé afin de conserver l'historique.</span>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="fermerSuppression()" [disabled]="enCoursSuppression">Annuler</button>
+          <button type="button" class="btn btn-danger" (click)="executerSuppression()" [disabled]="enCoursSuppression">
+            {{ enCoursSuppression ? 'Suppression...' : 'Confirmer la suppression' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+</section>

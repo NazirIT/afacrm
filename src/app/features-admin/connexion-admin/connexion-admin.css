@@ -1,0 +1,195 @@
+/* Conteneur principal */
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+/* Carte de connexion */
+.login-card {
+  width: 100%;
+  max-width: 440px;
+  background-color: #ffffff;
+  padding: 40px;
+  border-radius: 14px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
+  border-top: 4px solid #f28c28;
+}
+
+/* Badge Admin */
+.admin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fef3c7;
+  color: #92400e;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.admin-icon {
+  font-size: 16px;
+}
+
+/* En-tête */
+.login-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.login-header h1 {
+  color: #f28c28;
+  font-size: 32px;
+  font-weight: bold;
+  margin: 0 0 8px 0;
+}
+
+.login-header p {
+  color: #64748b;
+  font-size: 13px;
+  margin: 0;
+}
+
+/* Titre du formulaire */
+.login-title {
+  margin-bottom: 25px;
+}
+
+.login-title h2 {
+  color: #0f172a;
+  font-size: 22px;
+  margin: 0 0 8px 0;
+}
+
+.login-title p {
+  color: #64748b;
+  font-size: 13px;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Champs du formulaire */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  color: #334e68;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.form-group input {
+  padding: 13px 14px;
+  border: 1px solid #cbd5e0;
+  border-radius: 7px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-group input:focus {
+  border-color: #f28c28;
+  box-shadow: 0 0 0 3px rgba(242, 140, 40, 0.15);
+}
+
+.form-group input::placeholder {
+  color: #a0aec0;
+}
+
+.form-group small {
+  color: #e53e3e;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+/* Erreur de connexion */
+.error-message {
+  color: #b91c1c;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-bottom: 18px;
+}
+
+/* Bouton de connexion */
+.login-card button[type="submit"] {
+  width: 100%;
+  padding: 14px;
+  background-color: #f28c28;
+  color: #ffffff;
+  border: none;
+  border-radius: 7px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.login-card button[type="submit"]:hover:not(:disabled) {
+  background-color: #dc7415;
+  transform: translateY(-1px);
+}
+
+.login-card button[type="submit"]:disabled {
+  background-color: #cbd5e0;
+  cursor: not-allowed;
+}
+
+/* Lien Agent */
+.agent-link {
+  text-align: center;
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.agent-link p {
+  color: #64748b;
+  font-size: 13px;
+  margin: 0 0 6px 0;
+}
+
+.agent-link .link-btn {
+  color: #2563eb;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.agent-link .link-btn:hover {
+  text-decoration: underline;
+}
+
+/* Pied de page */
+.login-footer {
+  text-align: center;
+  margin-top: 24px;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 14px;
+}
+
+.login-footer p {
+  color: #94a3b8;
+  font-size: 12px;
+  margin: 0;
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: 28px 20px;
+  }
+}

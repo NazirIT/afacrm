@@ -1,0 +1,160 @@
+
+<section class="page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">CENTRE DE CONTACT</p>
+      <h1>Appels clients</h1>
+      <p class="subtitle">Enregistrez les échanges avec les clients.</p>
+    </div>
+    <span class="page-badge">Saisie d'un appel</span>
+  </header>
+
+  <section class="panel">
+    <div class="section-heading">
+      <span class="step">01</span>
+      <div>
+        <h2>Informations du client</h2>
+        <p>Recherchez un client à partir de son numéro ou son nom</p>
+      </div>
+    </div>
+
+    <form #formulaire="ngForm" (ngSubmit)="enregistrerAppel(formulaire)">
+      <div class="search-row">
+        <div class="field0">
+          <label for="telephone">Numéro de téléphone *</label>
+          <input 
+            id="telephone" 
+            name="numero_appelant"
+            type="tel"
+            [(ngModel)]="appel.numero_appelant"
+            (ngModelChange)="rechercherClient($event)"
+            placeholder="Ex. : 77 100 00 01 / nazir" 
+            required
+          />
+          <label for="canalReclamation">Choisis le canal de r&eacute;clamation *</label>
+          <select name="canal" id="canalReclamation"
+                  [(ngModel)]="appel.canal">
+            <option value="APPEL_TELEPHONE">Appel Telephonique</option>
+            <option value="WHATSAPP">WhatsApp</option>
+            <option value="EMAIL">Email</option>
+            <option value="ORAL">Bouche à bouche</option>
+          </select>
+          <small *ngIf="rechercheEnCours">Recherche en cours...</small>
+          <small *ngIf="clientTrouve">Client existant retrouvé.</small>
+          <small *ngIf="clientIntrouvable">nouveau numéro : saisissez le formulaire.</small>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label for="nom">Nom *</label>
+          <input 
+            id="nom" name="nom_client" type="text" placeholder="Nom du client"
+            [(ngModel)]="appel.nom_client"
+            required
+          />
+        </div>
+        <div class="field">
+          <label for="prenom">Prénom *</label>
+          <input id="prenom" name="prenom_client" type="text" 
+                 [(ngModel)]="appel.prenom_client" placeholder="Prénom du client" />
+        </div>
+      </div>
+
+      <div class="section-heading second-heading">
+        <span class="step">02</span>
+        <div>
+          <h2>Compte rendu de l'appel</h2>
+          <p>Décrivez brièvement la demande du client.</p>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="resume">Résumé de l'appel *</label>
+        <textarea id="resume" rows="5" name="resume"
+          placeholder="Motif de l'appel, informations recueillies, actions effectuées..."
+          [(ngModel)]="appel.resume"
+          required>
+        </textarea>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" [disabled]="chargement" class="btn btn-primary">
+          {{ chargement ? 'Enregistrement...' : "Enregistrer l'appel" }}
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <!-- <section class="panel optional-panel">
+    <div class="optional-heading">
+      <div>
+        <span class="optional-label">OPTIONNEL</span>
+        <h2>Créer une réclamation</h2>
+        <p>Si l'appel nécessite un suivi, vous pouvez enregistrer une réclamation.</p>
+      </div>
+      <button type="button" 
+        class="btn btn-outline"
+        (click)="ouvrirPopupReclamation()">
+        + Ajouter une réclamation
+      </button>
+    </div>
+  </section> -->
+
+  <div class="modal-overlay" *ngIf="popupReclamationOuvert">
+    <div class="modal-content" id="modal-content">
+      <div>
+        <span class="optionnal-label">NOUVELLE DEMANDE</span>
+        <h2>Nouvelle réclamation</h2>
+        <div class="form-group">
+          <label for="probleme">Type de problème</label>
+          <textarea name="probleme" id="probleme"
+                    [(ngModel)]="nouvelleReclamation.probleme!.type_probleme"
+                    rows="3" 
+                    placeholder="Décrivez le problème du client"
+                    required>
+          </textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea name="description" id="description"
+            [(ngModel)]="nouvelleReclamation.description" rows="4"
+            placeholder="Décrivez le problème rencontré par le client"
+            required>
+          </textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="urgence">Urgence</label>
+          <select name="urgence" id="urgence" 
+           [(ngModel)]="nouvelleReclamation.urgence" required>
+           <option value="faible">Faible</option>
+           <option value="moyenne">Moyenne</option>
+           <option value="haute">Haute</option>
+           <option value="critique">Critique</option>
+          </select>
+        </div>
+        
+        <p *ngIf="erreurReclamation" class="error-message">
+          {{ erreurReclamation }}
+        </p>
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          [disabled]="enregistrementReclamation"
+          (click)="enregistrerReclamation()">
+          {{ enregistrementReclamation ? 'Enregistrement...' : 'Enregistrer la réclamation' }}
+        </button>
+
+      </div>
+      <button type="button"
+        class="modal-close"
+        aria-label="Fermer"
+        (click)="fermerPopupReclamation()">
+        &times;</button>
+    </div>
+
+  </div>
+</section>

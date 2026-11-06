@@ -1,0 +1,120 @@
+<div class="login-container">
+  <div class="login-card">
+
+    <div class="login-header">
+      <h1>AFA CRM</h1>
+      <p>Plateforme de gestion des réclamations clients</p>
+    </div>
+
+    <div class="login-title">
+      <h2>{{ afficherInscription ? 'Créer un compte' : 'Connexion Agent' }}</h2>
+      <p>
+        {{ afficherInscription
+          ? 'Inscrivez-vous sur la plateforme AFA CRM'
+          : 'Connectez-vous à votre espace de travail' }}
+      </p>
+    </div>
+
+    <!-- CONNEXION -->
+    <form *ngIf="!afficherInscription"
+          [formGroup]="connexionForm"
+          (ngSubmit)="seConnecter()">
+
+      <div class="form-group">
+        <label for="username">Nom d'utilisateur</label>
+        <input id="username" type="text"
+               formControlName="username"
+               placeholder="Entrez votre identifiant">
+      </div>
+
+      <div class="form-group">
+        <label for="password">Mot de passe</label>
+        <input id="password" type="password"
+               formControlName="password"
+               placeholder="Entrez votre mot de passe">
+      </div>
+
+      <p class="error-message" *ngIf="erreur">{{ erreur }}</p>
+
+      <button type="submit"
+              [disabled]="connexionForm.invalid || chargement">
+        {{ chargement ? 'Connexion...' : 'Se connecter' }}
+      </button>
+
+    </form>
+
+    <!-- INSCRIPTION -->
+    <form *ngIf="afficherInscription"
+          [formGroup]="inscriptionForm"
+          (ngSubmit)="inscrire()">
+
+      <div class="form-group">
+        <label>Nom d'utilisateur</label>
+        <input type="text" formControlName="username">
+      </div>
+
+      <div class="form-group">
+        <label>Prénom</label>
+        <input type="text" formControlName="first_name">
+      </div>
+
+      <div class="form-group">
+        <label>Nom</label>
+        <input type="text" formControlName="last_name">
+      </div>
+
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" formControlName="email">
+      </div>
+
+      <div class="form-group">
+        <label>Téléphone</label>
+        <input type="tel" formControlName="telephone">
+      </div>
+
+      <div class="form-group">
+        <label>Mot de passe</label>
+        <input type="password" formControlName="password">
+      </div>
+
+      <div class="form-group">
+        <label>Confirmation du mot de passe</label>
+        <input type="password" formControlName="confirmation">
+      </div>
+
+      <p class="error-message" *ngIf="erreur">{{ erreur }}</p>
+
+      <button type="submit"
+              [disabled]="inscriptionForm.invalid || chargement">
+        {{ chargement ? 'Inscription...' : 'Créer mon compte' }}
+      </button>
+
+    </form>
+
+    <!-- CHANGEMENT DE FORMULAIRE -->
+    <div class="inscription-link">
+      <ng-container *ngIf="!afficherInscription; else retourConnexion">
+        <p>Vous n'avez pas encore de compte ?</p>
+        <button 
+            type="button" 
+            [disabled]="!inscriptionRemplie || chargement"
+            (click)="afficherInscription = true">
+          Créer un compte
+        </button>
+      </ng-container>
+
+      <ng-template #retourConnexion>
+        <p>Vous avez déjà un compte ?</p>
+        <button type="button" (click)="afficherInscription = false">
+          Retour à la connexion
+        </button>
+      </ng-template>
+    </div>
+
+    <div class="login-footer">
+      <p>© AFA - Afric Financial Agent</p>
+    </div>
+
+  </div>
+</div>

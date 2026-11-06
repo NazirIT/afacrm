@@ -1,0 +1,93 @@
+<!-- Start Sidebar -->
+<aside id="sidebar" [class.collapsed]="isCollapsed">
+
+    <div class="sidebar-header">
+        <span class="material-symbols-outlined">account_balance</span> 
+        <strong>{{ estAdmin ? 'AFA ADMIN' : 'AFA CRM' }}</strong>
+        
+        <button 
+            class="toggle-btn" type="button" 
+            aria-label="Plier le menu" 
+            (click)="toggleSidebar()"
+            [attr.aria-label]="isCollapsed ? 'Deplier le menu':'Plier le menu' " >
+            <span class="material-symbols-outlined">
+                {{ isCollapsed ? 'chevron_right':'menu'}} 
+            </span>
+        </button>
+    </div>
+    
+    <ul class="sidebar-list">
+        <!-- VUE ADMINISTRATEUR -->
+        <ng-container *ngIf="estAdmin; else menuAgent">
+            <li class="sidebar-list-item" data-target="page-dashboard-admin">
+                <a routerLink="/admin/dashboard" routerLinkActive="active-class">
+                    <span class="material-symbols-outlined">monitoring</span>
+                    <strong>Suivi des Agents</strong>
+                </a>
+            </li>
+
+            <li class="sidebar-list-item" data-target="page-users-admin">
+                <a routerLink="/admin/users" routerLinkActive="active-class">
+                    <span class="material-symbols-outlined">manage_accounts</span>
+                    <strong>Gestion des Agents</strong>
+                </a>
+            </li>
+
+            <li class="sidebar-list-item" data-target="page-reclamations">
+                <a routerLink="/reclamation" routerLinkActive="active-class">
+                    <span class="material-symbols-outlined">feedback</span>
+                    <strong>Tous les Tickets</strong>
+                </a>
+            </li>
+
+            <li class="sidebar-list-item" data-target="page-clients">
+                <a routerLink="/client" routerLinkActive="active-class">
+                    <span class="material-symbols-outlined">groups</span>
+                    <strong>Liste des Clients</strong>
+                </a>
+            </li>
+        </ng-container>
+
+        <!-- VUE AGENT STANDARD -->
+        <ng-template #menuAgent>
+            <li class="sidebar-list-item" data-target="page-dashboard">
+                <a routerLink="/dashboard" routerLinkActive="active-class">
+                    <span class="material-symbols-outlined">dashboard_customize</span>
+                    <strong>Tableau de bord</strong>
+                </a>
+            </li>
+
+            <li class="sidebar-list-item" data-target="page-appels">
+                <a routerLink="/appel" routerLinkActive="active-class">
+                    <span class="material-symbols-outlined active">call</span>
+                    <strong>Enregistrer un Ticket</strong>
+                </a>
+            </li>
+
+            <li class="sidebar-list-item" data-target="page-reclamations">
+                <a routerLink="/reclamation" routerLinkActive="active-class">
+                    <span class="material-symbols-outlined">feedback</span>
+                    <strong>Liste des Tickets</strong>
+                </a>
+            </li>
+
+            <li class="sidebar-list-item" data-target="page-clients">
+                <a routerLink="/client" routerLinkActive="active-class">
+                    <span class="material-symbols-outlined">groups</span>
+                    <strong>Liste des Clients</strong>
+                </a>
+            </li>
+        </ng-template>
+    </ul>
+
+    <div class="sidebar-profil">
+        <button type="button" (click)="confirmerDeconnexion()" title="Se déconnecter">
+            <span class="material-symbols-outlined">logout</span> 
+            <strong>
+                {{ utilisateurConnecte?.first_name }}
+                {{ utilisateurConnecte?.last_name }}
+            </strong>
+        </button>
+    </div>
+</aside>
+<!-- End Sidebar -->

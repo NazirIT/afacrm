@@ -1,0 +1,209 @@
+
+<section class="page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">CONFIGURATION</p>
+      <h1>Paramètres</h1>
+      <p class="subtitle">
+        Gérez les informations générales et les options de votre CRM.
+      </p>
+    </div>
+  </header>
+
+  <div class="settings-layout">
+    <aside class="settings-menu">
+      <h3>Configuration</h3>
+
+      <a class="menu-item active" href="#general">
+        <span class="menu-icon">GE</span>
+        Général
+      </a>
+
+      <a class="menu-item" href="#utilisateurs">
+        <span class="menu-icon">UT</span>
+        Utilisateurs
+      </a>
+
+      <a class="menu-item" href="#problemes">
+        <span class="menu-icon">PR</span>
+        Types de problèmes
+      </a>
+
+      <a class="menu-item" href="#notifications">
+        <span class="menu-icon">NO</span>
+        Notifications
+      </a>
+    </aside>
+
+    <div class="settings-content">
+      <section class="panel" id="general">
+        <div class="panel-header">
+          <div>
+            <h2>Informations générales</h2>
+            <p>Informations de base de l'application.</p>
+          </div>
+        </div>
+
+        <form>
+          <div class="field">
+            <label for="nom-application">Nom de l'application</label>
+            <input
+              id="nom-application"
+              type="text"
+              value="AFA CRM"
+              placeholder="Nom de l'application"
+            />
+          </div>
+
+          <div class="field">
+            <label for="description">Description</label>
+            <textarea
+              id="description"
+              rows="3"
+              placeholder="Description de l'application"
+            >Gestion des appels clients et des réclamations.</textarea>
+          </div>
+
+          <div class="field">
+            <label for="langue">Langue</label>
+            <select id="langue">
+              <option value="fr" selected>Français</option>
+              <option value="en">Anglais</option>
+            </select>
+          </div>
+
+          <div class="form-actions">
+            <button type="reset" class="btn btn-outline">
+              Annuler
+            </button>
+            <button type="button" class="btn btn-primary">
+              Enregistrer les modifications
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel" id="utilisateurs">
+        <div class="panel-header">
+          <div>
+            <h2>Utilisateurs</h2>
+            <p>Consultez les comptes autorisés à utiliser le CRM.</p>
+          </div>
+          <button type="button" class="btn btn-primary">
+            + Ajouter
+          </button>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Utilisateur</th>
+                <th>Identifiant</th>
+                <th>Rôle</th>
+                <th>Statut</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <td><strong>Administrateur</strong></td>
+                <td>admin@afa.sn</td>
+                <td>Administrateur</td>
+                <td><span class="status active-status">Actif</span></td>
+                <td><button type="button" class="btn btn-light">Modifier</button></td>
+              </tr>
+
+              <tr>
+                <td><strong>Agent clientèle</strong></td>
+                <td>agent@afa.sn</td>
+                <td>Agent</td>
+                <td><span class="status active-status">Actif</span></td>
+                <td><button type="button" class="btn btn-light">Modifier</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel" id="problemes">
+        <div class="panel-header">
+          <div>
+            <h2>Types de problèmes</h2>
+            <p>Catégories disponibles lors de la création d'une réclamation.</p>
+          </div>
+          <button type="button" class="btn btn-primary">
+            + Ajouter un type
+          </button>
+        </div>
+
+        <div class="problem-list">
+          <div class="problem-item">
+            <span>Problème de compte</span>
+            <button type="button" class="btn btn-light">Modifier</button>
+          </div>
+
+          <div class="problem-item">
+            <span>Problème de paiement</span>
+            <button type="button" class="btn btn-light">Modifier</button>
+          </div>
+
+          <div class="problem-item">
+            <span>Problème de carte</span>
+            <button type="button" class="btn btn-light">Modifier</button>
+          </div>
+
+          <div class="problem-item">
+            <span>Problème technique</span>
+            <button type="button" class="btn btn-light">Modifier</button>
+          </div>
+
+          <div class="problem-item">
+            <span>Autre problème</span>
+            <button type="button" class="btn btn-light">Modifier</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="notifications">
+        <div class="panel-header">
+          <div>
+            <h2>Notifications</h2>
+            <p>Préférences d'affichage des alertes dans le CRM.</p>
+          </div>
+        </div>
+
+        <div class="notification-option">
+          <div>
+            <strong>Nouvelles réclamations</strong>
+            <p>Afficher une alerte lorsqu'une réclamation est créée.</p>
+          </div>
+          <input type="checkbox" checked aria-label="Nouvelles réclamations" />
+        </div>
+
+        <div class="notification-option">
+          <div>
+            <strong>Réclamations en attente</strong>
+            <p>Signaler les demandes qui nécessitent un suivi.</p>
+          </div>
+          <input type="checkbox" checked aria-label="Réclamations en attente" />
+        </div>
+
+        <div class="notification-option">
+          <div>
+            <strong>Réclamations résolues</strong>
+            <p>Afficher les notifications de résolution.</p>
+          </div>
+          <input type="checkbox" aria-label="Réclamations résolues" />
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-primary">
+            Enregistrer les préférences
+          </button>
+        </div>
+      </section>
+    </div>
+  </div>
+</section>

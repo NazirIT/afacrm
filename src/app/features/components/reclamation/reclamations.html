@@ -1,0 +1,257 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">SUIVI ET TRAITEMENT</p>
+      <h1>Réclamations reçues</h1>
+      <p class="subtitle">Consultez et suivez les demandes des clients.</p>
+    </div>
+  </header>
+
+  <div class="stats">
+    <article class="stat-card">
+      <span class="stat-label">Total</span>
+      <strong>{{ reclamations.length }}</strong>
+    </article>
+    <article class="stat-card">
+      <span class="stat-label">En attente</span>
+      <strong class="orange">{{ reclamationsEnAttente }}</strong>
+    </article>
+    <article class="stat-card">
+      <span class="stat-label">En cours</span>
+      <strong class="blue">{{ reclamationsEnCours }}</strong>
+    </article>
+    <article class="stat-card">
+      <span class="stat-label">Résolu</span>
+      <strong class="green">{{ reclamationsResolues }}</strong>
+    </article>
+    <article class="stat-card">
+      <span class="stat-label">Cloturé</span>
+      <strong class="green">{{ reclamationsCloturees }}</strong>
+    </article>
+  </div>
+
+  <section class="panel">
+    <div class="panel-header">
+      <div>
+        <h2>Liste des réclamations</h2>
+        <p>Retrouvez les demandes et leur état d'avancement.</p>
+      </div>
+      <input 
+          type="search" 
+          placeholder="Rechercher par nom, prénom ou téléphone..."
+          [ngModel]="recherche"
+          (ngModelChange)="rechercherReclamations($event)" />
+      @if (messageRecherche) {
+        <small><i>{{ messageRecherche }}</i></small>
+      }
+    </div>
+
+    <div class="filters">
+      <button
+        class="filter"
+        [class.active]="filtreActif === 'toutes'"
+        (click)="changerFiltre('toutes')">
+        Toutes
+      </button>
+
+      <button
+        class="filter"
+        [class.active]="filtreActif === 'attente'"
+        (click)="changerFiltre('attente')">
+        En attente
+      </button>
+
+      <button
+        class="filter"
+        [class.active]="filtreActif === 'cours'"
+        (click)="changerFiltre('cours')">
+        En cours
+      </button>
+
+      <button
+        class="filter"
+        [class.active]="filtreActif === 'resolues'"
+        (click)="changerFiltre('resolues')">
+        Résolues
+      </button>
+
+      <button
+        class="filter"
+        [class.active]="filtreActif === 'cloturees'"
+        (click)="changerFiltre('cloturees')">
+        Clôturées
+      </button>
+    </div>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Référence</th>
+            <th>Client</th>
+            <th>Téléphone</th>
+            <th>Problème</th>
+            <th>Canal</th>
+            <th>Date Ouverture</th>
+            <th>Date Limite</th>
+            <th>Date Résolution</th>
+            <th>Priorité</th>
+            <th>Statut</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (reclamation of (recherche ? reclamationsRecherchees : reclamationsFiltrees); track reclamation.id) {
+            <tr>
+              <td><strong>REC-{{ reclamation.id }}</strong></td>
+              <td>
+                @if (getAppel(reclamation); as appel) {
+                  {{ appel.prenom_client }} {{ appel.nom_client }}
+                } @else {
+                  Client inconnu
+                }
+              </td>
+              <td>
+                @if (getAppel(reclamation); as appel) {
+                  {{ appel.numero_appelant }}
+                } @else {
+                  Numéro inconnu
+                }
+              </td>
+              <td>{{ reclamation.probleme?.type_probleme || '-' }}</td>
+              <td>
+                @if (getAppel(reclamation); as appel) {
+                  {{ appel.canal }}
+                } @else {
+                  Canal inconnu   
+                }
+              </td>
+              <td>{{ (reclamation.date_ouverture | date:'EEEE dd MMMM à HH:mm') || '-' }}</td>
+              <td>{{ (reclamation.date_limite | date:'EEEE dd MMMM à HH:mm') || '-' }}</td>
+              <td>{{ (reclamation.date_resolution | date:'EEEE dd MMMM à HH:mm') || '-' }}</td>
+              <td>{{ reclamation.urgence.toUpperCase() }}</td>
+              <td>{{ reclamation.statut.toUpperCase() }}</td>
+              <td>
+                <button type="button" class="btn btn-light" title="Consulter" (click)="ouvrirDetails(reclamation)">
+                  <span class="material-symbols-outlined">description</span>
+                </button>
+                <button type="button" class="btn btn-light btn-transfert" title="Attribuer à un agent plus compétent" (click)="ouvrirTransfert(reclamation)">
+                  <span class="material-symbols-outlined">forward</span>
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="11"><i>Aucune réclamation trouvée.</i></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <small>Affichage des {{ (recherche ? reclamationsRecherchees : reclamationsFiltrees).length }} réclamations</small>
+  </section>
+
+  <!-- Modal Détails Réclamation -->
+  @if (popupDetailsOuvert && reclamationSelectionnee) {
+    <div class="modal-overlay" (click)="fermerDetails()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <span class="eyebrow">DÉTAILS RÉCLAMATION</span>
+            <h2>REC-{{ reclamationSelectionnee.id }}</h2>
+          </div>
+          <button type="button" class="modal-close" (click)="fermerDetails()">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          @if (getAppel(reclamationSelectionnee); as appel) {
+            <p><strong>Client :</strong> {{ appel.prenom_client }} {{ appel.nom_client }}</p>
+            <p><strong>Téléphone :</strong> {{ appel.numero_appelant }}</p>
+          } @else {
+            <p><strong>Client :</strong> Client inconnu</p>
+            <p><strong>Téléphone :</strong> Numéro inconnu</p>
+          }
+
+          <p><strong>Agent responsable :</strong> 
+            {{ reclamationSelectionnee.agent ? (reclamationSelectionnee.agent.first_name + ' ' + reclamationSelectionnee.agent.last_name + ' (@' + reclamationSelectionnee.agent.username + ')') : 'Non assigné' }}
+          </p>
+          <p><strong>Problème :</strong> {{ reclamationSelectionnee.probleme?.type_probleme || '-' }}</p>
+          <p><strong>Date d'ouverture :</strong> {{ (reclamationSelectionnee.date_ouverture | date:'dd/MM/yyyy HH:mm') || '-' }}</p>
+          <p><strong>Urgence / Priorité :</strong> {{ reclamationSelectionnee.urgence }}</p>
+          <p><strong>Statut :</strong> {{ reclamationSelectionnee.statut }}</p>
+
+          <p><strong>Description et historique :</strong></p>
+          <div class="modal-resume">
+            {{ reclamationSelectionnee.description }}
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-light btn-transfert" (click)="fermerDetails(); ouvrirTransfert(reclamationSelectionnee)">
+            <span class="material-symbols-outlined" style="vertical-align: middle; font-size: 16px;">forward</span>
+            Attribuer à un agent plus compétent
+          </button>
+          <button type="button" class="btn btn-primary" (click)="fermerDetails()">Fermer</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Modal Transfert à un autre agent -->
+  @if (popupTransfertOuvert && reclamationATransferer) {
+    <div class="modal-overlay" (click)="fermerTransfert()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <span class="eyebrow">ATTRIBUTION COLLÈGUE</span>
+            <h2>Transférer REC-{{ reclamationATransferer.id }}</h2>
+          </div>
+          <button type="button" class="modal-close" (click)="fermerTransfert()">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          @if (erreurTransfert) {
+            <div class="alert-error">{{ erreurTransfert }}</div>
+          }
+          @if (succesTransfert) {
+            <div class="alert-success">{{ succesTransfert }}</div>
+          }
+
+          <p class="form-help">
+            Vous ne parvenez pas à régler ce problème ? Transférez le dossier à un autre agent plus compétent pour le prendre en charge.
+          </p>
+
+          <div class="form-group" style="margin-top: 14px;">
+            <label for="agentSelect">Sélectionner un agent plus compétent *</label>
+            <select id="agentSelect" class="form-select" [(ngModel)]="agentCibleId">
+              <option [ngValue]="null" disabled selected>-- Choisir un agent --</option>
+              @for (agent of agentsEligibles; track agent.id) {
+                <option [ngValue]="agent.id">
+                  {{ agent.first_name }} {{ agent.last_name }} (@{{ agent.username }})
+                </option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="motifInput">Motif du transfert / Compétences requises *</label>
+            <textarea 
+              id="motifInput" 
+              class="form-textarea" 
+              rows="4" 
+              placeholder="Expliquez la difficulté rencontrée ou les raisons pour lesquelles ce collègue est plus compétent..."
+              [(ngModel)]="motifTransfert"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" (click)="fermerTransfert()" [disabled]="transfertEnCours">Annuler</button>
+          <button type="button" class="btn btn-primary" (click)="confirmerTransfert()" [disabled]="transfertEnCours || !agentCibleId">
+            {{ transfertEnCours ? 'Transfert en cours...' : 'Confirmer le transfert' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</section>

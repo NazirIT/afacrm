@@ -1,0 +1,386 @@
+<section class="page">
+  <!-- En-tête -->
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">CONSOLE DE SUPERVISION ADMIN</p>
+      <h1>Suivi des activités des agents</h1>
+      <p class="subtitle">
+        Pilotez les performances, les appels téléphoniques et les réclamations gérées par l'équipe support.
+      </p>
+    </div>
+
+    <div class="header-actions">
+      <!-- Filtre rapide par Agent -->
+      <div class="agent-select-wrapper">
+        <label for="agentSelect" class="select-label">Agent :</label>
+        <select id="agentSelect" class="form-select" [(ngModel)]="agentFiltreId" (change)="selectionnerAgent(agentFiltreId)">
+          <option value="all">Tous les agents ({{ agents.length }})</option>
+          @for (agent of agents; track agent.id) {
+            <option [value]="agent.id">{{ agent.first_name }} {{ agent.last_name }} (@{{ agent.username }})</option>
+          }
+        </select>
+      </div>
+
+      <button type="button" class="btn btn-light" (click)="chargerDonnees()" title="Actualiser les données">
+        <span class="material-symbols-outlined sync-icon">refresh</span> Actualiser
+      </button>
+      <span class="date-label">{{ today | date:'EEEE dd MMMM yyyy' }}</span>
+    </div>
+  </header>
+
+  <!-- Message d'erreur éventuel -->
+  @if (erreur) {
+    <div class="alert alert-error">
+      <span class="material-symbols-outlined">warning</span>
+      <span>{{ erreur }}</span>
+    </div>
+  }
+
+  <!-- Cartes de statistiques (KPIs) -->
+  <section class="stats">
+    <article class="stat-card">
+      <div class="stat-top">
+        <span class="stat-icon purple-bg">AG</span>
+        <span class="trend neutral">{{ agents.length }} actifs</span>
+      </div>
+      <span class="stat-label">Agents support client</span>
+      <strong>{{ agents.length }}</strong>
+      <p>Conseillers enregistrés sur le CRM</p>
+    </article>
+
+    <article class="stat-card">
+      <div class="stat-top">
+        <span class="stat-icon blue-bg">AP</span>
+        <span class="trend positive">{{ nomAgentFiltre }}</span>
+      </div>
+      <span class="stat-label">Appels pris en charge</span>
+      <strong>{{ totalAppelsActifs }}</strong>
+      <p>Volume total d'appels enregistrés</p>
+    </article>
+
+    <article class="stat-card">
+      <div class="stat-top">
+        <span class="stat-icon orange-bg">RC</span>
+        <span class="trend neutral">{{ totalEnAttente }} à traiter</span>
+      </div>
+      <span class="stat-label">Réclamations traitées</span>
+      <strong>{{ totalReclamationsActives }}</strong>
+      <p>{{ totalEnCours }} en cours de traitement</p>
+    </article>
+
+    <article class="stat-card">
+      <div class="stat-top">
+        <span class="stat-icon green-bg">RS</span>
+        <span class="trend positive">{{ pourcentageGlobalResolution }} %</span>
+      </div>
+      <span class="stat-label">Taux de résolution</span>
+      <strong>{{ totalResolues + totalCloturees }}</strong>
+      <p>Réclamations résolues ou clôturées</p>
+    </article>
+  </section>
+
+  <!-- Section 1 : Tableau comparatif des performances de chaque agent -->
+  <section class="panel mb-24">
+    <div class="panel-header">
+      <div>
+        <h2>Tableau de bord des agents</h2>
+        <p>Vue synthétique des activités et résultats pour chaque conseiller du service client.</p>
+      </div>
+
+      <div class="search-box">
+        <input 
+          type="search" 
+          placeholder="Rechercher un agent (nom, email)..." 
+          [(ngModel)]="rechercheAgent" 
+          class="form-input-search"
+        />
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Agent</th>
+            <th>Coordonnées</th>
+            <th>Appels pris</th>
+            <th>Réclamations</th>
+            <th>Résolues</th>
+            <th>Taux de résolution</th>
+            <th>Dernière activité</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (perf of agentsFiltres; track perf.agent.id) {
+            <tr [class.highlighted-row]="agentFiltreId === perf.agent.id">
+              <td>
+                <div class="agent-info-cell">
+                  <div class="agent-avatar">
+                    {{ perf.agent.first_name[0] || 'A' }}{{ perf.agent.last_name[0] || 'G' }}
+                  </div>
+                  <div>
+                    <strong>{{ perf.agent.first_name }} {{ perf.agent.last_name }}</strong>
+                    <small>@{{ perf.agent.username }}</small>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="contact-cell">
+                  <span>{{ perf.agent.email || '-' }}</span>
+                  <small>{{ perf.agent.telephone || '-' }}</small>
+                </div>
+              </td>
+              <td>
+                <span class="badge badge-blue">{{ perf.totalAppels }} appel(s)</span>
+              </td>
+              <td>
+                <span class="badge badge-purple">{{ perf.totalReclamations }} ticket(s)</span>
+              </td>
+              <td>
+                <span class="badge badge-green">{{ perf.reclamationsResolues + perf.reclamationsCloturees }}</span>
+              </td>
+              <td>
+                <div class="rate-cell">
+                  <span class="rate-value">{{ perf.tauxResolution }}%</span>
+                  <div class="mini-progress-track">
+                    <div class="mini-progress-bar" [style.width.%]="perf.tauxResolution"></div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                @if (perf.dernierAppelDate) {
+                  <span class="last-activity">{{ perf.dernierAppelDate | date:'dd/MM HH:mm' }}</span>
+                  <small class="activity-client">{{ perf.dernierClientNom || 'Client' }}</small>
+                } @else {
+                  <span class="text-muted">Aucun appel</span>
+                }
+              </td>
+              <td>
+                <div class="btn-group">
+                  <button 
+                    type="button" 
+                    class="btn btn-sm"
+                    [class.btn-primary]="agentFiltreId === perf.agent.id"
+                    [class.btn-light]="agentFiltreId !== perf.agent.id"
+                    (click)="selectionnerAgent(agentFiltreId === perf.agent.id ? 'all' : (perf.agent.id || 'all'))"
+                  >
+                    {{ agentFiltreId === perf.agent.id ? 'Vue globale' : 'Filtrer' }}
+                  </button>
+                  <button type="button" class="btn btn-sm btn-outline" (click)="ouvrirDetailsAgent(perf)">
+                    Détail
+                  </button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="8" class="text-center py-20">
+                <p class="text-muted">Aucun agent trouvé correspondant aux critères.</p>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel-footer">
+      <small>Affichage de {{ agentsFiltres.length }} agent(s) sur {{ agents.length }}</small>
+      @if (agentFiltreId !== 'all') {
+        <button type="button" class="btn btn-link btn-sm" (click)="selectionnerAgent('all')">
+          ✕ Réinitialiser le filtre agent
+        </button>
+      }
+    </div>
+  </section>
+
+  <!-- Section 2 : Grille d'activités en direct (Appels récents & Réclamations par agent) -->
+  <section class="content-grid">
+    <!-- Panneau Activité récente (Appels) -->
+    <article class="panel activity-panel">
+      <div class="panel-header">
+        <div>
+          <h2>Journal des appels récents</h2>
+          <p>
+            Derniers appels enregistrés par 
+            <strong>{{ nomAgentFiltre }}</strong>
+          </p>
+        </div>
+      </div>
+
+      <div class="activity-list">
+        @for (appel of (appelsAffiches | slice:0:6); track appel.id) {
+          <div class="activity-item">
+            <span class="activity-icon call-icon">AP</span>
+            <div class="activity-info">
+              <div class="activity-title-row">
+                <strong>{{ appel.prenom_client }} {{ appel.nom_client }} · {{ appel.numero_appelant }}</strong>
+                <span class="agent-tag">
+                  <span class="material-symbols-outlined tag-icon">person</span>
+                  {{ appel.agent ? (appel.agent.first_name + ' ' + appel.agent.last_name) : 'Agent inconnu' }}
+                </span>
+              </div>
+              <small class="activity-resume">{{ appel.resume || 'Aucun résumé renseigné.' }}</small>
+              <div class="activity-meta">
+                <span class="meta-item">⏱ Durée : {{ appel.duree || '00:00:00' }}</span>
+                <span class="meta-item">📞 Canal : {{ appel.canal }}</span>
+              </div>
+            </div>
+            <span class="activity-time">{{ appel.date_heure | date:'dd/MM HH:mm' }}</span>
+          </div>
+        } @empty {
+          <p class="text-muted py-20"><i>Aucun appel enregistré pour ce filtre.</i></p>
+        }
+      </div>
+    </article>
+
+    <!-- Panneau État & Répartition des réclamations -->
+    <article class="panel status-panel">
+      <div class="panel-header">
+        <div>
+          <h2>État des réclamations</h2>
+          <p>Répartition actuelle pour : <strong>{{ nomAgentFiltre }}</strong></p>
+        </div>
+      </div>
+
+      <div class="total-box">
+        <span>Total des réclamations</span>
+        <strong>{{ totalReclamationsActives }}</strong>
+      </div>
+
+      <div class="status-row">
+        <div class="status-description">
+          <span><i class="dot pending-dot"></i> Ouvertes / En attente</span>
+          <strong>{{ totalEnAttente }}</strong>
+        </div>
+        <div class="progress-track">
+          <div class="progress-bar pending-bar" [style.width.%]="pourcentageAttente"></div>
+        </div>
+      </div>
+
+      <div class="status-row">
+        <div class="status-description">
+          <span><i class="dot progress-dot"></i> En cours de traitement</span>
+          <strong>{{ totalEnCours }}</strong>
+        </div>
+        <div class="progress-track">
+          <div class="progress-bar progress-bar-blue" [style.width.%]="pourcentageEnCours"></div>
+        </div>
+      </div>
+
+      <div class="status-row">
+        <div class="status-description">
+          <span><i class="dot resolved-dot"></i> Résolues</span>
+          <strong>{{ totalResolues }}</strong>
+        </div>
+        <div class="progress-track">
+          <div class="progress-bar resolved-bar" [style.width.%]="pourcentageResolues"></div>
+        </div>
+      </div>
+
+      <div class="status-row">
+        <div class="status-description">
+          <span><i class="dot closed-dot"></i> Clôturées</span>
+          <strong>{{ totalCloturees }}</strong>
+        </div>
+        <div class="progress-track">
+          <div class="progress-bar closed-bar" [style.width.%]="pourcentageCloturees"></div>
+        </div>
+      </div>
+
+      <!-- Dernières réclamations assignées -->
+      <hr class="panel-divider" />
+      <h3 class="panel-subheading">Derniers tickets assignés</h3>
+
+      <div class="mini-tickets-list">
+        @for (rec of (reclamationsAffichees | slice:0:4); track rec.id) {
+          <div class="mini-ticket-item">
+            <div class="mini-ticket-header">
+              <span class="ticket-ref">#REC-{{ rec.id }}</span>
+              <span class="statut-badge" [ngClass]="'statut-' + rec.statut">{{ rec.statut }}</span>
+            </div>
+            <p class="mini-ticket-desc">{{ rec.description | slice:0:70 }}...</p>
+            <div class="mini-ticket-footer">
+              <small class="text-muted">Agent : {{ rec.agent?.first_name }} {{ rec.agent?.last_name }}</small>
+              <span class="urgence-pill" [ngClass]="'urgence-' + rec.urgence">{{ rec.urgence }}</span>
+            </div>
+          </div>
+        } @empty {
+          <p class="text-muted"><i>Aucune réclamation disponible.</i></p>
+        }
+      </div>
+    </article>
+  </section>
+
+  <!-- Modal Détail individuel d'un Agent -->
+  @if (modalDetailsOuvert && agentDetails) {
+    <div class="modal-overlay" (click)="fermerDetailsAgent()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div class="modal-agent-profile">
+            <div class="modal-avatar">
+              {{ agentDetails.agent.first_name[0] }}{{ agentDetails.agent.last_name[0] }}
+            </div>
+            <div>
+              <span class="eyebrow">FICHE DE SUIVI AGENT</span>
+              <h2>{{ agentDetails.agent.first_name }} {{ agentDetails.agent.last_name }}</h2>
+              <p class="subtitle">@{{ agentDetails.agent.username }} · {{ agentDetails.agent.email }}</p>
+            </div>
+          </div>
+          <button type="button" class="modal-close" (click)="fermerDetailsAgent()">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="modal-kpi-grid">
+            <div class="modal-kpi-card">
+              <span>Appels passés</span>
+              <strong>{{ agentDetails.totalAppels }}</strong>
+            </div>
+            <div class="modal-kpi-card">
+              <span>Réclamations</span>
+              <strong>{{ agentDetails.totalReclamations }}</strong>
+            </div>
+            <div class="modal-kpi-card">
+              <span>Résolues</span>
+              <strong class="text-success">{{ agentDetails.reclamationsResolues + agentDetails.reclamationsCloturees }}</strong>
+            </div>
+            <div class="modal-kpi-card">
+              <span>Taux de succès</span>
+              <strong class="text-primary">{{ agentDetails.tauxResolution }}%</strong>
+            </div>
+          </div>
+
+          <div class="modal-info-block">
+            <h4>Informations de contact</h4>
+            <p><strong>Téléphone :</strong> {{ agentDetails.agent.telephone || 'Non renseigné' }}</p>
+            <p><strong>Email :</strong> {{ agentDetails.agent.email || 'Non renseigné' }}</p>
+            <p><strong>Rôle dans le système :</strong> {{ agentDetails.agent.role }}</p>
+          </div>
+
+          @if (agentDetails.dernierAppelResume) {
+            <div class="modal-info-block">
+              <h4>Dernière interaction enregistrée</h4>
+              <p><strong>Client :</strong> {{ agentDetails.dernierClientNom }}</p>
+              <p><strong>Date :</strong> {{ agentDetails.dernierAppelDate | date:'dd/MM/yyyy à HH:mm' }}</p>
+              <p><strong>Résumé :</strong></p>
+              <div class="modal-resume-box">{{ agentDetails.dernierAppelResume }}</div>
+            </div>
+          }
+        </div>
+
+        <div class="modal-footer">
+          <button 
+            type="button" 
+            class="btn btn-primary" 
+            (click)="selectionnerAgent(agentDetails.agent.id || 'all'); fermerDetailsAgent()"
+          >
+            Filtrer le dashboard pour cet agent
+          </button>
+          <button type="button" class="btn btn-light" (click)="fermerDetailsAgent()">
+            Fermer
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</section>

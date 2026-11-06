@@ -1,0 +1,155 @@
+/* Le composant sidebar lui-même */
+:host {
+  display: block;
+  width: 76px;
+  flex: 0 0 250px;
+  transition: width 0.25s ease, flex-basis 0.25s ease;
+}
+
+:host(.collapsed) {
+  width: 76px;
+  flex-basis: 76px;
+}
+
+/* ------- SIDEBAR ------- */
+#sidebar{
+    grid-area: sidebar;
+    height: 100%;
+    width: 100%;
+    background-color: wheat;
+
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
+#sidebar.collapsed {
+  width: 100%;
+}
+
+.sidebar-profil button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.2s ease;
+}
+
+/* Masquer les textes quand le menu est réduit */
+#sidebar.collapsed strong {
+  display: none;
+}/* Centrer les icônes */
+#sidebar.collapsed .sidebar-header,
+#sidebar.collapsed .sidebar-list-item,
+#sidebar.collapsed .sidebar-profil {
+  justify-content: center;
+}
+
+.toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #475569;
+  cursor: pointer;
+}
+
+.toggle-btn:hover {
+  background: #eff6ff;
+  color: #2563eb;
+}
+.sidebar-header{
+    margin: 0%;
+    padding: 15%;
+}
+.sidebar-list{
+    margin-top: 30%;
+    padding: 0;
+    list-style-type: none;
+    height: 100vh;
+}
+.sidebar-list .sidebar-list-item{
+    padding: 20px;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif ;
+    display: flex;
+    flex-direction: row;
+    margin: 5%;
+    box-shadow: 0 0 2px 2px grey;
+}
+.sidebar-profil, .sidebar-header{
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}
+.sidebar-profil span,.sidebar-header span{
+    font-size: 40px;
+}
+.sidebar-profil strong,.sidebar-header strong{
+    margin: 7px;
+}
+.sidebar-list-item:hover{
+    cursor: cell;
+}
+
+.toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #475569;
+  cursor: pointer;
+}
+
+.toggle-btn:hover {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.material-symbols-outlined {
+  font-size: 24px;
+}
+
+/* Style par défaut de vos liens */
+a {
+  display: block;
+  padding: 12px;
+  color: #333333;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+/* 🎯 Style appliqué AUTOMATIQUEMENT grâce à routerLinkActive="active" */
+a.active-class {
+  color: #ffffff;
+  background-color: #007bff; /* Bleu par exemple */
+  font-weight: bold;
+  border-left: 4px solid #0056b3;
+}
+
+
+.user-role-tag {
+  display: inline-block;
+  background: #f28c28;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 6px;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
